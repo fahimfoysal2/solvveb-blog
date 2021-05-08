@@ -18,7 +18,10 @@ class BlogController extends Controller
         $posts = Post::where('post_status', '=', 'published')
             ->latest()
             ->paginate(4);
-        return view('blog.index', compact('posts'));
+            
+        if (!count($posts) > 0) {
+            return view('blog.not-found');
+        } else return view('blog.index', compact('posts'));
     }
 
     public function viewBlogPost($title)

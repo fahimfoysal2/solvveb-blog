@@ -10,8 +10,8 @@
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="{{Asset('blog/vendor/bootstrap/css/bootstrap.min.css')}}">
     <!-- Google fonts-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Satisfy&amp;display=swap">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;display=swap">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Satisfy&amp;display=swap">
     <!-- Lightbox-->
     <link rel="stylesheet" href="{{Asset('blog/vendor/lightbox2/css/lightbox.min.css')}}">
     <!-- theme stylesheet-->
@@ -21,8 +21,8 @@
     <!-- Favicon-->
     <link rel="shortcut icon" href="{{Asset('blog/img/favicon.png')}}">
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+    <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
     {{--  open every link in new tab  --}}
     {{--    <base target="_blank">--}}
 </head>
@@ -212,7 +212,7 @@
 <script src="{{Asset('blog/vendor/lightbox2/js/lightbox.min.js')}}"></script>
 <script src="{{Asset('blog/js/front.js')}}"></script>
 <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.7.1/css/all.css"
       integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 </body>
 </html>

@@ -46,7 +46,9 @@
                                 @endif
 
                                 @csrf
-                                @method('PUT')
+                                @if(isset($post->id))
+                                    @method('PUT')
+                                @endif
 
                                 <div class="form-row">
                                     {{--  Category  --}}
