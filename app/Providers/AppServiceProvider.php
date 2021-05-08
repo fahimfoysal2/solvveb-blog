@@ -25,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Key too long error
+        Schema::defaultStringLength(191);
+
         Paginator::useBootstrap();
 
         // demo data for sidebar
