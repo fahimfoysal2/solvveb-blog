@@ -20,12 +20,5 @@ class AdminSeeder extends Seeder
             'password' => bcrypt("12345678"),
             'user_type' => "admin",
         ]);
-
-        DB::table('users')->insert([
-            'name' => "Touhid",
-            'email' => "touhid@usesr.com",
-            'password' => bcrypt("12345678"),
-            'user_type' => "guest",
-        ]);
     }
 }

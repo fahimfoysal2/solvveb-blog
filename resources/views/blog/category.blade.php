@@ -10,7 +10,7 @@
                 <div class="container pb-4">
                     <div class="row mb-5 pb-4">
                         @foreach($categories as $category)
-                            <div class="col-lg-4 mb-4 mb-lg-0">
+                            <div class="col-lg-4 mb-4 mb-lg-4">
                                 <a class="category-block bg-center bg-cover"
                                    style="background: url('img/category-bg-1.jpg')"
                                    href="{{route('blog.category.post', $category->category_name)}}">
@@ -20,8 +20,6 @@
                                 </a>
                             </div>
                         @endforeach
-                        {{--                        <div class="col-lg-4 mb-4 mb-lg-0"><a class="category-block bg-center bg-cover" style="background: url(img/category-bg-2.jpg)" href="#"><span class="category-block-title">Fashion</span></a></div>--}}
-                        {{--                        <div class="col-lg-4"><a class="category-block bg-center bg-cover" style="background: url(img/category-bg-3.jpg)" href="#"><span class="category-block-title">Tips &amp; Tricks</span></a></div>--}}
                     </div>
                 </div>
             </section>

@@ -10,14 +10,15 @@
                 </div>
             @endif
 
-            @foreach($posts as $post)
+            @foreach($posts as $counter=>$post)
                 {{------------ Single Post ---------------}}
                 <div class="row align-items-center mb-5">
 
                     {{--Post Image--}}
                     <div class="col-lg-6">
                         <a class="d-block post-trending mb-4" href="{{route('blog.post', $post->post_title)}}">
-                            <img class="img-fluid w-100" src="{{Asset('blog/img/post-img-1.jpg')}}" alt=""/>
+                            <img class="img-fluid w-100" src="{{Asset($post->post_image)}}"
+                                 alt="{{$post->post_title}}"/>
                         </a>
                     </div>
 
@@ -27,8 +28,8 @@
                             {{-- post category --}}
                             <li class="list-inline-item mr-2">
                                 <a class="category-link font-weight-normal"
-                                   href="{{route('blog.category.post', $post->category->category_name)}}">
-                                    {{$post->category->category_name}}
+                                   href="{{route('blog.category.post',$post->category_name)}}">
+                                    {{$post->category_name}}
                                 </a>
                             </li>
 

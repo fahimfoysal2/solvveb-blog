@@ -18,16 +18,32 @@ class BlogController extends Controller
         $posts = Post::where('post_status', '=', 'published')
             ->latest()
             ->paginate(4);
-            
-        if (!count($posts) > 0) {
-            return view('blog.not-found');
-        } else return view('blog.index', compact('posts'));
+        if (count($posts) > 0) {
+            foreach ($posts as $post) {
+
+                $post->category_name = isset($post->category_id) ? $post->category->category_name : "Uncategorized";
+
+                if ($post->post_image === 'none') {
+                    $post->post_image = "https://source.unsplash.com/350x200/?" . $post->category_name;
+                } else {
+                    $post->post_image = 'images/post/' . $post->post_image;
+                }
+            }
+            return view('blog.index', compact('posts'));
+        } else return view('blog.not-found');
     }
 
     public function viewBlogPost($title)
     {
         $post = Post::where('post_title', '=', "$title")->first();
         if ($post) {
+            $post->category_name = isset($post->category_id) ? $post->category->category_name : "Uncategorized";
+
+            if ($post->post_image === 'none') {
+                $post->post_image = "https://source.unsplash.com/350x200/?" . $post->category_name;
+            } else {
+                $post->post_image = 'images/post/' . $post->post_image;
+            }
             return view('blog.post', compact('post'));
         } else return view('blog.not-found');
     }
@@ -92,6 +108,15 @@ class BlogController extends Controller
         }
 
         if (count($posts) > 0) {
+            foreach ($posts as $post) {
+                $post->category_name = isset($post->category_id) ? $post->category->category_name : "Uncategorized";
+
+                if ($post->post_image === 'none') {
+                    $post->post_image = "https://source.unsplash.com/350x200/?" . $post->category_name;
+                } else {
+                    $post->post_image = 'images/post/' . $post->post_image;
+                }
+            }
             return view('blog.index', compact('posts', 'flag_typeOfPost'));
         } else return view('blog.not-found');
     }
@@ -112,6 +137,15 @@ class BlogController extends Controller
         }
 
         if (count($posts) > 0) {
+            foreach ($posts as $post) {
+                $post->category_name = isset($post->category_id) ? $post->category->category_name : "Uncategorized";
+
+                if ($post->post_image === 'none') {
+                    $post->post_image = "https://source.unsplash.com/350x200/?" . $post->category_name;
+                } else {
+                    $post->post_image = 'images/post/' . $post->post_image;
+                }
+            }
             return view('blog.index', compact('posts', 'flag_typeOfPost'));
         } else return view('blog.not-found');
     }

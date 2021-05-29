@@ -2,27 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Yajra\DataTables\DataTables;
 
 class CategoryController extends Controller
 {
-    public function jsonCategory(Request $request)
+    public function __construct()
     {
-        if ($request->ajax()) {
-            $data = Category::latest()->get();
+    }
 
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $actionBtn = '<a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-xs btn-warning edit">&#128295;</a> <a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-xs btn-danger delete"><i class="fas fa-trash"></i></a>';
-                    return $actionBtn;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+    public function getAllCategories(Request $request)
+    {
+        $viewModel = resolve('App\ViewModels\ManageCategoryModel');
+
+        if ($request->ajax()) {
+            return $viewModel->getAllCategoriesJson();
+        } else {
+            return abort('403');
         }
     }
 
@@ -39,7 +36,7 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return void
      */
     public function create()
     {
@@ -54,20 +51,13 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->category_status = ($request->category_status == '1') ? 'active' : 'paused';
-
         $validated = $request->validate([
             'category_name' => 'required|unique:categories',
         ]);
-        $validated['category_status'] = $request->category_status;
+        $validated['category_status'] = ($request->category_status == '1') ? 'active' : 'paused';
 
-        $is_created = Category::create($validated)->category_name;
-
-        if ($is_created) {
-            return response()->json("$is_created Category Created");
-        } else {
-            return response()->json("Operation Failed.");
-        }
+        $viewModel = resolve('App\ViewModels\ManageCategoryModel');
+        return $viewModel->storeCategory($validated);
     }
 
     /**
@@ -78,15 +68,15 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
-        return response()->json($category);
+        $viewModel = resolve('App\ViewModels\ManageCategoryModel');
+        return $viewModel->getCategory($id);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param int $id
-     * @return Response
+     * @return void
      */
     public function edit($id)
     {
@@ -102,16 +92,13 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $category = Category::find($id);
-        $status = $request->category_status ? 'active' : 'paused';
+        $data['category_name'] = $request->category_name;
+        $data['category_status'] = $request->category_status ? 'active' : 'paused';
 
-        $updated = $category->fill([
-            "category_name" => $request->category_name,
-            "category_status" => $status,
-        ])->save();
+        //@todo if category status changes, change all associated posts too.
 
-
-        return response()->json($updated);
+        $viewModel = resolve('App\ViewModels\ManageCategoryModel');
+        return $viewModel->updateCategory($id, $data);
     }
 
     /**
@@ -122,27 +109,15 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $product = Category::find($id);
-
-        if ($product) {
-            $product->delete();
-            return response()->json("Deleted");
-        } else {
-            return response()->json("Not Found");
-        }
+        $viewModel = resolve('App\ViewModels\ManageCategoryModel');
+        return $viewModel->deleteCategory($id);
     }
 
-    public function jsonCategorySearch(Request $request): JsonResponse
+    public function categorySearch(Request $request): JsonResponse
     {
-        $categories = [];
-
+        $viewModel = resolve('App\ViewModels\ManageCategoryModel');
         if ($request->has('q')) {
-            $search = $request->q;
-            $categories = Category::select("id", "category_name")
-                ->where('category_status', 'active')
-                ->where('category_name', 'LIKE', "%$search%")
-                ->get();
+            return $viewModel->searchCategoriesJson($request->q);
         }
-        return response()->json($categories);
     }
 }

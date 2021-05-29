@@ -19,7 +19,7 @@
 
                 <div class="card o-hidden border-0 shadow-lg my-2 my-md-5">
                     <div class="card-body p-0">
-                        <!-- Nest   ed Row within Card Body -->
+                        <!-- Nested Row within Card Body -->
                         <div class="row">
                             <div class="col-lg-5 d-none d-lg-block bg-login-image"></div>
                             <div class="col-lg-7">

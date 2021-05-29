@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use App\Services\CategoryService;
+use App\Services\ICategoryService;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(ICategoryService::class, CategoryService::class);
     }
 
     /**
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // Key too long error
-        Schema::defaultStringLength(191);
+        // Schema::defaultStringLength(191);
 
         Paginator::useBootstrap();
 

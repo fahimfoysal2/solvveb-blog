@@ -176,7 +176,7 @@
             var table = $('#category_dataTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('jsonCategory') }}",
+                ajax: "{{ route('getCategories') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'category_name', name: 'category_name'},
@@ -292,7 +292,7 @@
                     $('#category_dataTable').DataTable().ajax.reload();
                 },
                 error: function (data) {
-                    console.log(data);
+                    // console.log(data);
                     alert("Error updating data!")
                 }
             });

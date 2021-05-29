@@ -11,18 +11,27 @@ use Yajra\DataTables\DataTables;
 
 class PostController extends Controller
 {
+    /**
+     * Post list for Data Table
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
     public function jsonPostList(Request $request)
     {
         if ($request->ajax()) {
             $posts = Post::all();
+
+//            dd($posts);
             $data = array();
-            foreach ($posts as $x => $post) {
-                $data[$x]['id'] = $post->id;
-                $data[$x]['title'] = $post->post_title;
-                $data[$x]['status'] = $post->post_status;
-                $data[$x]['posted'] = $post->created_at->diffForHumans();
-                $data[$x]['author'] = $post->user->name;
-                $data[$x]['category'] = $post->category->category_name;
+            foreach ($posts as $i => $post) {
+                $data[$i]['id'] = $post->id;
+                $data[$i]['title'] = $post->post_title;
+                $data[$i]['status'] = $post->post_status;
+                $data[$i]['posted'] = $post->created_at->diffForHumans();
+                $data[$i]['author'] = $post->user->name;
+                $data[$i]['category'] = isset($post->category_id) ? $post->category->category_name : "Uncategorized";
             }
 
             return DataTables::of($data)
@@ -67,41 +76,43 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-//        'post_title', +
-//        'post_details', +
-//        'post_author->user_id', +
-//        'post_status', +
-//        'post_image', +
-//        'post_category->category_id',
-//        tags
-
         $post_data = $request->validate([
+            // @todo post eith empty category allowed, change it to paused state or else
+            // 'post_category' => 'required',
             'post_title' => 'required',
             'post_details' => 'required',
+            'post_image' => 'image|mimes:jpeg,jpg,png,svg',
         ]);
+
+        if (isset($request->post_image)) {
+            $image_name = time() . '.' . $request->post_image->extension();
+            $request->post_image->move(public_path('images/post'), $image_name);
+            $post_data['post_image'] = $image_name;
+        } else $post_data['post_image'] = 'none';
 
         $post_data['user_id'] = Auth::id();
         $post_data['post_status'] = ($request->post_status === 'published') ? 'published' : 'paused';
-        $post_data['post_image'] = (isset($request->post_image)) ? "image" : 'none';
         $post_data['category_id'] = $request->post_category;
-        // dd($post_data);
 
         // create new blog post here
         $post = Post::create($post_data);
 
-        // create or find tag_ids to associate with post
-        $tag_ids = array();
-        foreach ($request->post_tags as $x => $tag) {
-            $temp = Tag::firstOrCreate(
-                ['tag_name' => $tag],
-                ['tag_status' => 'active']
-            )->id;
+        // @todo post with empty tags can be created too
+        if (isset($request->post_tags)) {
+            // create or find tag_ids to associate with post
+            $tag_ids = array();
 
-            array_push($tag_ids, $temp);
+            foreach ($request->post_tags as $tag) {
+                $temp = Tag::firstOrCreate(
+                    ['tag_name' => $tag],
+                    ['tag_status' => 'active']
+                )->id;
+
+                array_push($tag_ids, $temp);
+            }
+            // many to many association in 'post_tag'
+            $post->tags()->attach($tag_ids);
         }
-
-        // many to many association in 'post_tag'
-        $post->tags()->attach($tag_ids);
 
         return redirect()->route('posts.index');
     }
@@ -139,13 +150,16 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $tag_ids = array();
-        foreach ($request->post_tags as $tag) {
-            $temp = Tag::firstOrCreate(
-                ['tag_name' => $tag],
-                ['tag_status' => 'active']
-            )->id;
+        // @todo handle null/no tags error
+        if (isset($request->post_tags)) {
+            foreach ($request->post_tags as $tag) {
+                $temp = Tag::firstOrCreate(
+                    ['tag_name' => $tag],
+                    ['tag_status' => 'active']
+                )->id;
 
-            array_push($tag_ids, $temp);
+                array_push($tag_ids, $temp);
+            }
         }
 
         $post = Post::find($id);
@@ -153,6 +167,11 @@ class PostController extends Controller
         $post->post_title = $request->post_title;
         $post->post_status = $request->post_status;
         $post->post_details = $request->post_details;
+        if (isset($request->post_image)) {
+            $image_name = time() . '.' . $request->post_image->extension();
+            $request->post_image->move(public_path('images/post'), $image_name);
+            $post->post_image = $image_name;
+        }
 
         $post->save();
 

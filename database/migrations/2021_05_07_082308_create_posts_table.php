@@ -19,9 +19,10 @@ class CreatePostsTable extends Migration
             $table->string('post_status');
             $table->foreignId('user_id')->constrained();
             $table->foreignId('category_id')
+                ->nullable()
                 ->constrained()
                 ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->nullOnDelete();
             $table->longText('post_details');
             $table->string('post_image')->nullable();
             $table->timestamps();

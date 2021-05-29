@@ -84,9 +84,7 @@ Route::get('/password-reset', function () {
 Route::get('/', [BlogController::class, 'viewBlogList'])->name('blog.home');
 Route::get('/view/{post_title}', [BlogController::class, 'viewBlogPost'])->name('blog.post');
 Route::get('/categories', [BlogController::class, 'viewCategories'])->name('blog.categories');
-/**
- * @todo change this to blog.comment
- */
+// @todo change this to blog.comment
 Route::post('/comment', [BlogController::class, 'saveComment'])->name('comment.save');
 Route::get('/category/{category_name}', [BlogController::class, 'categoryToPosts'])->name('blog.category.post');
 Route::get('/tag/{tag_name}', [BlogController::class, 'tagToPosts'])->name('blog.tag.post');
@@ -110,13 +108,13 @@ Route::prefix('manage')->middleware(['auth', 'can:administrator'])->group(functi
     ]);
 
     // json routes for: category, tag, user & post
-    Route::get('/get-categories', [CategoryController::class, 'jsonCategory'])->name('jsonCategory');
+    Route::get('/get-categories', [CategoryController::class, 'getAllCategories'])->name('getCategories');
     Route::get('/get-tags', [TagController::class, 'jsonTag'])->name('jsonTag');
     Route::get('/get-users', [UserController::class, 'jsonUserList'])->name('jsonUserList');
     Route::get('/get-posts', [PostController::class, 'jsonPostList'])->name('jsonPostList');
 
-    // routes for table2 & searching
-    Route::get('/category-search', [CategoryController::class, 'jsonCategorySearch'])->name('search-category');
+    // routes for select2 & searching
+    Route::get('/category-search', [CategoryController::class, 'categorySearch'])->name('search-category');
     Route::get('/tag-search', [TagController::class, 'jsonTagSearch'])->name('search-tag');
 
     // json routes for comment model
@@ -126,4 +124,3 @@ Route::prefix('manage')->middleware(['auth', 'can:administrator'])->group(functi
     ]);
 
 });
-

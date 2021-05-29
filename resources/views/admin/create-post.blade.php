@@ -2,20 +2,9 @@
 @section('title', 'Admin - Post')
 
 @section('page-level-stylesheets')
-    <script
-        src="https://cdn.tiny.cloud/1/rdp4z63jkf04t2luyb9lk58h9190u98eclz40st3bx1uyc7n/tinymce/5/tinymce.min.js"
-        referrerpolicy="origin">
-    </script>
     {{--      Select2  --}}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css"
-          rel="stylesheet"/>
-    {{--    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>--}}
-    <script>
-        tinymce.init({
-            selector: '#post_details'
-        });
-    </script>
+    <link href="{{Asset('admin/vendor/select2/select2.min.css')}}" rel="stylesheet"/>
+    <link href="{{Asset('admin/vendor/select2/select2-bootstrap4.min.css')}}" rel="stylesheet"/>
 @endsection
 
 @section('main-content')
@@ -40,9 +29,9 @@
                 @endif
 
                 @if(isset($post->id))
-                    <form method="POST" action="{{route('posts.update', $post->id)}}">
+                    <form method="POST" action="{{route('posts.update', $post->id)}}" enctype="multipart/form-data">
                         @else
-                            <form method="POST" action="{{route('posts.store')}}">
+                            <form method="POST" action="{{route('posts.store')}}" enctype="multipart/form-data">
                                 @endif
 
                                 @csrf
@@ -85,25 +74,36 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <label class="input-group-text" for="title">Post Title</label>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="title">Post Title</label>
+                                            </div>
+                                            <input autocomplete="off" type="text" class="form-control"
+                                                   name="post_title" id="title"
+                                                   placeholder="A grate post title"
+                                                   value="{{$post->post_title ?? ''}}"
+                                            >
                                         </div>
-                                        {{--                            @if($post->post_title)--}}
-                                        <input autocomplete="off" type="text" class="form-control"
-                                               name="post_title" id="title"
-                                               placeholder="A grate post title"
-                                               value="{{$post->post_title ?? ''}}"
-                                        >
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="image">Image</label>
+                                            </div>
+                                            <input type="file" class="form-control" name="post_image" id="image"
+                                                   placeholder="{{$post->post_image ?? 'no image selected'}}"
+                                                   value="{{$post->post_image ?? ''}}"
+                                            >
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="post_details">Post Details</label>
-                                    <textarea class="form-control" id="post_details" name="post_details">
-                           {{$post->post_details ?? "New Solvveb Blog Post"}}
-                        </textarea>
+                                    <textarea class="form-control" id="post_details"
+                                              name="post_details">{{$post->post_details ?? "New Blog Post"}}</textarea>
                                 </div>
 
                                 <div class="form-row">
@@ -148,18 +148,16 @@
 @section('data-table')@endsection
 
 @section('page-level-scripts')
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: 'a11ychecker advcode casechange formatpainter linkchecker autolink lists checklist media mediaembed pageembed permanentpen powerpaste table advtable tinycomments tinymcespellchecker',
-            toolbar: 'a11ycheck addcomment showcomments casechange checklist code formatpainter pageembed permanentpen table',
-            toolbar_mode: 'floating',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-        });
+    <script src="{{Asset('admin/vendor/select2/select2.min.js')}}"></script>
+    <script
+        {{--        src="{{Asset('admin/vendor/tinymce/tinymce.min.js')}}"> --}}
+        src="https://cdn.tiny.cloud/1/rdp4z63jkf04t2luyb9lk58h9190u98eclz40st3bx1uyc7n/tinymce/5/tinymce.min.js"
+        referrerpolicy="origin">
+    </script>
 
+    <script>
         $(document).ready(function () {
+
             $('#category').select2({
                 placeholder: "Select a Category",
                 theme: 'bootstrap4',
@@ -203,6 +201,16 @@
                     cache: true
                 }
             });
+
+            tinymce.init({
+                selector: '#post_details',
+                plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+                toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+                toolbar_mode: 'sliding',
+                toolbar_sticky: true,
+                height: 400,
+            });
+
         });
 
     </script>
