@@ -92,10 +92,11 @@
                                             <div class="input-group-prepend">
                                                 <label class="input-group-text" for="image">Image</label>
                                             </div>
-                                            <input type="file" class="form-control" name="post_image" id="image"
-                                                   placeholder="{{$post->post_image ?? 'no image selected'}}"
-                                                   value="{{$post->post_image ?? ''}}"
-                                            >
+                                            @if(isset($post->post_image))
+                                                <input type="hidden" name="old_post_image"
+                                                       value="{{$post->post_image}}">
+                                            @endif
+                                            <input type="file" class="form-control" name="post_image" id="image">
                                         </div>
                                     </div>
                                 </div>

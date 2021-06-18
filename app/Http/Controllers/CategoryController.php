@@ -51,6 +51,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        //@todo Move to validation service
         $validated = $request->validate([
             'category_name' => 'required|unique:categories',
         ]);
@@ -113,11 +114,14 @@ class CategoryController extends Controller
         return $viewModel->deleteCategory($id);
     }
 
-    public function categorySearch(Request $request): JsonResponse
+    public function categorySearch(Request $request)
     {
         $viewModel = resolve('App\ViewModels\ManageCategoryModel');
         if ($request->has('q')) {
             return $viewModel->searchCategoriesJson($request->q);
+        } else {
+            // make more good approach
+            return $viewModel->searchCategoriesJson("");
         }
     }
 }

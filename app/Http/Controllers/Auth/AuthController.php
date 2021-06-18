@@ -3,26 +3,29 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\IAuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthController extends Controller
 {
+    private $authservice;
+
+    public function __construct(IAuthService $authService)
+    {
+        $this->authservice = $authService;
+    }
+
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
-
+        $is_loggedIn = $this->authservice->login($request);
+        if ($is_loggedIn) {
             // after login
             if (Gate::inspect('administrator')->allowed()) {
                 // visit admin panel
                 return redirect()->intended('dashboard');
             } else // visit blog homepage
                 return redirect()->intended('/');
-
         }
 
         // redirect back if failed to authenticate
@@ -35,27 +38,30 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->authservice->logout($request);
         // after log out
         return redirect('/welcome');
     }
 
     public function register(Request $request)
     {
+        // move to validation service
         $validatedData = $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
+            'first_name' => 'required', 'last_name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
 
-        $validatedData['name'] = $validatedData['first_name'] . " " . $validatedData['last_name'];
-        $validatedData['password'] = bcrypt($validatedData['password']);
-        User::create($validatedData);
-
+        // register
+        $response = $this->authservice->register($validatedData);
         // after registration
-        return redirect('/login');
+        if ($response->id) {
+            return redirect('/login');
+        } else {
+            return back()
+                ->withErrors([
+                    'error' => 'Server Error! Registration Failed',
+                ]);
+        }
     }
 }

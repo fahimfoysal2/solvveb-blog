@@ -2,7 +2,7 @@
 
 namespace App\Repository\Interfaces;
 
-interface ICategoryRepository
+interface ICategoryRepository extends IEloquentRepository
 {
     public function searchCategory($keyword);
 }

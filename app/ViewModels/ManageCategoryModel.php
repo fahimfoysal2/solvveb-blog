@@ -36,7 +36,7 @@ class ManageCategoryModel
 
     public function storeCategory($data)
     {
-        $created = $this->categoryService->storeCategory($data)->category_name;
+        $created = $this->categoryService->storeCategory($data);
 
         return $created ? response()->json("$created Category Created") : response()->json("Operation Failed.");
     }
@@ -54,5 +54,14 @@ class ManageCategoryModel
     public function searchCategoriesJson($keyword)
     {
         return response()->json($this->categoryService->searchCategories($keyword));
+    }
+
+    /********
+     * for blog controller
+     ********/
+
+    public function getAllActiveCategories()
+    {
+        return $this->categoryService->getAllActiveCategories();
     }
 }

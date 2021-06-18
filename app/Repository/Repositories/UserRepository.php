@@ -27,4 +27,8 @@ class UserRepository extends BaseRepository implements IUserRepository
         return $this->model->all();
     }
 
+    public function adminCount()
+    {
+        return User::where('user_type', 'admin')->count();
+    }
 }

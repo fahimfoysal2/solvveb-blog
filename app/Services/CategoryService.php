@@ -24,9 +24,14 @@ class CategoryService implements ICategoryService
         return $this->categoryRepository->getAllLatest();
     }
 
+    public function getAllActiveCategories()
+    {
+        return $this->categoryRepository->where('category_status', 'active')->get();
+    }
+
     public function storeCategory($data)
     {
-        return $this->categoryRepository->create($data);
+        return $this->categoryRepository->create($data)->category_name;
     }
 
     public function getCategory($id)
@@ -47,6 +52,9 @@ class CategoryService implements ICategoryService
 
     public function searchCategories($keyword)
     {
-        return $this->categoryRepository->searchCategory($keyword);
+        $items = $this->categoryRepository->searchCategory($keyword);
+        if (!count($items) > 0) {
+            return [];
+        } else return $items;
     }
 }

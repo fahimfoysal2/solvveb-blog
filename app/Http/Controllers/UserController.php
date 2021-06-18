@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\DataTables;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -17,24 +16,20 @@ class UserController extends Controller
      */
     public function jsonUserList(Request $request)
     {
-        if ($request->ajax()) {
-            $data = User::latest()->get();
+        $viewModel = resolve('App\ViewModels\ManageUserModel');
 
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $actionBtn = '<a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-xs btn-warning edit">&#128295;</a> <a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-xs btn-danger delete"><i class="fas fa-trash"></i></a>';
-                    return $actionBtn;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+        if ($request->ajax()) {
+            return $viewModel->userListForDatatable();
+        } else {
+            // request is not ajax, handle error
+            return redirect()->back();
         }
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -44,7 +39,7 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -54,8 +49,8 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -66,19 +61,19 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
-        $tag = User::find($id);
-        return response()->json($tag);
+        $viewModel = resolve('App\ViewModels\ManageUserModel');
+        return $viewModel->getSingleUser($id);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -88,35 +83,20 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
+        //@todo move to validation service
         $data_to_update = $request->validate([
-            'id' => 'required',
-            'name' => 'required',
-            'email' => 'required'
+            'id' => 'required', 'name' => 'required', 'email' => 'required',
         ]);
 
-        $data_to_update['user_type'] = $request->user_type ? 'admin' : 'guest';
+        $viewModel = resolve('App\ViewModels\ManageUserModel');
 
-        if ($id == Auth::id() && $data_to_update['user_type'] === 'guest') {
-            $adminCount = User::where('user_type', 'admin')->count();
-            if ($adminCount < 2) {
-                return response()->json("error: You are the only admin to maintain this site!");
-            }
-        }
-
-        if (isset($request->password)) {
-            $data_to_update['password'] = bcrypt($request->password);
-        }
-
-        $user = User::find($id);
-        $updated = $user->fill($data_to_update)->save();
-
-        return response()->json($updated);
+        return $viewModel->updateUser($request->except('_token'));
     }
 
 
@@ -124,24 +104,11 @@ class UserController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy($id)
     {
-        if ($id == Auth::user()->id) {
-            $adminCount = User::where('user_type', 'admin')->count();
-            if ($adminCount < 2) {
-                return response()->json("error: You are the only admin to maintain this site!");
-            }
-        }
-
-        $user = User::find($id);
-
-        if ($user) {
-            $user->delete();
-            return response()->json("User Data Deleted");
-        } else {
-            return response()->json("Error: Not Found");
-        }
+        $viewModel = resolve('App\ViewModels\ManageUserModel');
+        return $viewModel->deleteUser($id);
     }
 }

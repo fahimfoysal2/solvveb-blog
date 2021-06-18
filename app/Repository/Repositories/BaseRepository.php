@@ -78,19 +78,16 @@ abstract class BaseRepository implements IEloquentRepository
 
     public function where(...$where): Builder
     {
-        // TODO: Implement where() method.
         return $this->model->where(...$where);
     }
 
     public function with(...$with): Builder
     {
-        // TODO: Implement with() method.
         return $this->model->with(...$with);
     }
 
     public function get(): Collection
     {
-        // TODO: Implement get() method.
         return $this->model->get();
     }
 
@@ -101,5 +98,14 @@ abstract class BaseRepository implements IEloquentRepository
     public function getAllLatest()
     {
         return $this->model->latest()->get();
+    }
+
+    /**
+     * Get All data in Latest Order With another Model
+     * @return mixed
+     */
+    public function getAllLatestWith($model)
+    {
+        return $this->model->latest()->with($model)->get();
     }
 }

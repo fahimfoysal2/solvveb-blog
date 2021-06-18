@@ -6,23 +6,17 @@ use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Yajra\DataTables\DataTables;
 
 class TagController extends Controller
 {
     public function jsonTag(Request $request)
     {
         if ($request->ajax()) {
-            $data = Tag::latest()->get();
-
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $actionBtn = '<a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-xs btn-warning edit">&#128295;</a> <a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-xs btn-danger delete"><i class="fas fa-trash"></i></a>';
-                    return $actionBtn;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
+            $viewModel = resolve('App\ViewModels\ManageTagModel');
+            return $viewModel->getAllTagsForDataTable();
+        } else {
+            // do something for http request
+            return back();
         }
     }
 
@@ -54,20 +48,12 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $request->tag_status = ($request->tag_status == '1') ? 'active' : 'paused';
+        // move to validation service
+        $request->validate(['tag_name' => 'required|unique:tags']);
 
-        $validated = $request->validate([
-            'tag_name' => 'required|unique:tags',
-        ]);
-        $validated['tag_status'] = $request->tag_status;
+        $viewModel = resolve('App\ViewModels\ManageTagModel');
 
-        $is_created = Tag::create($validated)->tag_name;
-
-        if ($is_created) {
-            return response()->json("$is_created Category Created");
-        } else {
-            return response()->json("Operation Failed.");
-        }
+        return $viewModel->createTag($request->only('tag_name', 'tag_status'));
     }
 
     /**
@@ -78,8 +64,8 @@ class TagController extends Controller
      */
     public function show($id)
     {
-        $tag = Tag::find($id);
-        return response()->json($tag);
+        $viewModel = resolve('App\ViewModels\ManageTagModel');
+        return $viewModel->getOneTag($id);
     }
 
     /**
@@ -102,16 +88,8 @@ class TagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $tag = Tag::find($id);
-        $status = $request->tag_status ? 'active' : 'paused';
-
-        $updated = $tag->fill([
-            "tag_name" => $request->tag_name,
-            "tag_status" => $status,
-        ])->save();
-
-
-        return response()->json($updated);
+        $viewModel = resolve('App\ViewModels\ManageTagModel');
+        return $viewModel->updateTag($request->only("id", "tag_name", "tag_status"));
     }
 
     /**
@@ -122,27 +100,17 @@ class TagController extends Controller
      */
     public function destroy($id)
     {
-        $product = Tag::find($id);
-
-        if ($product) {
-            $product->delete();
-            return response()->json("Deleted");
-        } else {
-            return response()->json("Not Found");
-        }
+        $viewModel = resolve('App\ViewModels\ManageTagModel');
+        return $viewModel->deleteTag($id);
     }
 
     public function jsonTagSearch(Request $request)
     {
-        $tags = [];
+        $viewModel = resolve('App\ViewModels\ManageTagModel');
 
         if ($request->has('q')) {
             $search = $request->q;
-            $tags = Tag::select("id", "tag_name")
-                ->where('tag_status', 'active')
-                ->where('tag_name', 'LIKE', "%$search%")
-                ->get();
+            return $viewModel->searchTag($search);
         }
-        return response()->json($tags);
     }
 }

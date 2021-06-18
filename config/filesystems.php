@@ -69,4 +69,6 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'image_path' => 'images/post/',
+
 ];

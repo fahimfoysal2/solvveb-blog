@@ -10,6 +10,8 @@ interface ICategoryService
 
     public function getAllCategories();
 
+    public function getAllActiveCategories();
+
     public function storeCategory($data);
 
     public function getCategory($id);

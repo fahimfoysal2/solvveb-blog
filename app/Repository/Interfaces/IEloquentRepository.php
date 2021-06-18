@@ -16,7 +16,6 @@ interface IEloquentRepository
      */
     public function create(array $attributes): Model;
 
-
     /**
      * @param $id
      * @return Model|null
@@ -33,7 +32,6 @@ interface IEloquentRepository
 
     public function fill($id, array $attributes): bool;
 
-
     /**
      * Delete
      * @param $id
@@ -48,4 +46,6 @@ interface IEloquentRepository
     public function get(): Collection;
 
     public function getAllLatest();
+
+    public function getAllLatestWith($model);
 }
