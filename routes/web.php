@@ -20,7 +20,13 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+	
+	
+//------ HTTPS -------
+if (App::environment('production')) {
+    URL::forceScheme('https');
+}
+	
 // ================== Landing ==================
 Route::get('/welcome', function () {
     return view('welcome');
@@ -91,7 +97,9 @@ Route::get('/tag/{tag_name}', [BlogController::class, 'tagToPosts'])->name('blog
 
 
 /**
+ * ==========================================
  * admin level routes with "Gate(administrator)"
+ * ===========================================
  */
 Route::prefix('manage')->middleware(['auth', 'can:administrator'])->group(function () {
 
