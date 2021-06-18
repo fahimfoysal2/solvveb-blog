@@ -54,7 +54,7 @@ return [
 
     'url' => env('APP_URL', 'https://solvveb.herokuapp.com'),
 
-    'asset_url' => env('ASSET_URL', true),
+    'asset_url' => env('ASSET_URL', false),
 
     /*
     |--------------------------------------------------------------------------
